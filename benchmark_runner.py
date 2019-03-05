@@ -22,7 +22,7 @@ CONFIG_TEMPLATE = './task_config_template.cfg'
 
 
 
-if __name__ == '__main__':
+def run_benchmark():
     parser = argparse.ArgumentParser(description="Run a benchmark task.")
     parser.add_argument('--framework', type=str, help='Framework eg. mxnet')
     parser.add_argument('--metrics-policy', type=str, help='Metrics policy section name e.g. metrics_paramaters_images')
@@ -60,4 +60,12 @@ if __name__ == '__main__':
         suffix=args.metrics_suffix,
         framework=args.framework
     )
+
+if __name__ == '__main__':
+    logger = logging.getLogger(__name__)
+    try:
+        run_benchmark()
+    except Exception:
+        logger.exception("Fatal error in run_benchmark !!")
+        exit()
 
