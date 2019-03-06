@@ -4,7 +4,7 @@ import argparse
 from ast import literal_eval
 
 import logging
-logging.basicConfig(level=logging.INFO)
+
 from utils import metrics_manager
 from utils import data_manager
 try:
@@ -22,19 +22,7 @@ CONFIG_TEMPLATE = './task_config_template.cfg'
 
 
 
-def run_benchmark():
-    parser = argparse.ArgumentParser(description="Run a benchmark task.")
-    parser.add_argument('--framework', type=str, help='Framework eg. mxnet')
-    parser.add_argument('--metrics-policy', type=str, help='Metrics policy section name e.g. metrics_paramaters_images')
-    parser.add_argument('--task-name', type=str, help='Task Name e.g. resnet50_cifar10_symbolic.')
-    parser.add_argument('--metrics-suffix', type=str, help='Metrics suffix e.g. --metrics-suffix daily')
-    parser.add_argument('--num-gpus', type=int, help='Numbers of gpus. e.g. --num-gpus 8')
-    parser.add_argument('--command-to-execute', type=str, help='The script command that performs benchmarking')
-    parser.add_argument('--data-set', type=str, help='The data set to use for benchmarking, eg. imagenet, imagenet-480px-256px-q95')
-    parser.add_argument('--metrics-template', type=str, help='The template file to use for metrics pattern', default=CONFIG_TEMPLATE)
-    
-    args = parser.parse_args()    
-   
+def run_benchmark(args):
     if 'imagenet' in args.data_set: 
         data_manager.getImagenetData(args.data_set)
 
@@ -62,10 +50,24 @@ def run_benchmark():
     )
 
 if __name__ == '__main__':
-    logger = logging.getLogger(__name__)
+    parser = argparse.ArgumentParser(description="Run a benchmark task.")
+    parser.add_argument('--framework', type=str, help='Framework eg. mxnet')
+    parser.add_argument('--metrics-policy', type=str, help='Metrics policy section name e.g. metrics_paramaters_images')
+    parser.add_argument('--task-name', type=str, help='Task Name e.g. resnet50_cifar10_symbolic.')
+    parser.add_argument('--metrics-suffix', type=str, help='Metrics suffix e.g. --metrics-suffix daily')
+    parser.add_argument('--num-gpus', type=int, help='Numbers of gpus. e.g. --num-gpus 8')
+    parser.add_argument('--command-to-execute', type=str, help='The script command that performs benchmarking')
+    parser.add_argument('--data-set', type=str, help='The data set to use for benchmarking, eg. imagenet, imagenet-480px-256px-q95')
+    parser.add_argument('--metrics-template', type=str, help='The template file to use for metrics pattern', default=CONFIG_TEMPLATE)
+
+    args = parser.parse_args()
+
+    log_file_location = args.task_name + ".log"
+    logging.basicConfig(filename=log_file_location,level=logging.DEBUG)
+
     try:
-        run_benchmark()
+        run_benchmark(args)
     except Exception:
-        logger.exception("Fatal error in run_benchmark !!")
+        logging.exception("Fatal error in run_benchmark")
         exit()
 
